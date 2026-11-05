@@ -3,487 +3,305 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jadwal Pembayaran dan Tugas</title>
+  <meta name="theme-color" content="#f6f7f5">
+  <title>Jadwal Asrama — BTS Yeongdong</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f5;
+      --surface: #fff;
+      --surface-soft: #f1f4f1;
+      --ink: #202821;
+      --muted: #788078;
+      --line: #e7ebe6;
+      --accent: #47745b;
+      --accent-dark: #315940;
+      --accent-soft: #edf4ee;
+      --radius: 18px;
+      --shadow: 0 16px 45px rgba(34, 48, 37, .07);
     }
-    
+
+    * { box-sizing: border-box; }
     body {
-      background-color: #f5f5f5;
-      color: #333;
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.6;
-      padding: 1rem;
+      -webkit-font-smoothing: antialiased;
     }
-    
-    .container {
-      width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
+    button { font: inherit; }
+    .page-shell { width: min(100% - 40px, 920px); margin: 0 auto; padding: 48px 0 64px; }
+    .site-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 32px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px;
+      background: var(--accent); color: white; font-size: 15px; font-weight: 750; letter-spacing: -.06em;
     }
-    
-    .tab-nav {
-      display: flex;
-      background: #3498db;
-      color: white;
+    .brand-name { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: -.02em; }
+    .brand-caption { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+    .today-chip { display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.7); color: #59635b; font-size: 12px; font-weight: 600; }
+    .today-chip::before { width: 7px; height: 7px; border-radius: 50%; background: #79a987; content: ""; }
+    .intro { margin-bottom: 24px; }
+    .eyebrow { margin: 0 0 7px; color: var(--accent); font-size: 11px; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }
+    .intro h1 { margin: 0; font-size: clamp(27px, 5vw, 38px); line-height: 1.2; letter-spacing: -.055em; }
+    .intro p:last-child { margin: 9px 0 0; color: var(--muted); font-size: 14px; }
+    .app-card { overflow: hidden; border: 1px solid rgba(220,226,220,.85); border-radius: 24px; background: var(--surface); box-shadow: var(--shadow); }
+    .tab-nav { display: flex; gap: 5px; overflow-x: auto; padding: 12px; border-bottom: 1px solid var(--line); scrollbar-width: none; }
+    .tab-nav::-webkit-scrollbar { display: none; }
+    .tab-btn { flex: 1 0 auto; padding: 10px 15px; border: 0; border-radius: 12px; background: transparent; color: #747d75; cursor: pointer; font-size: 13px; font-weight: 650; transition: background .2s ease, color .2s ease, transform .2s ease; }
+    .tab-btn:hover { background: var(--surface-soft); color: var(--ink); }
+    .tab-btn.active { background: var(--accent-soft); color: var(--accent-dark); }
+    .tab-btn:focus-visible, .week-controls button:focus-visible { outline: 3px solid rgba(71,116,91,.25); outline-offset: 2px; }
+    .tab-content { display: none; padding: clamp(20px, 5vw, 34px); }
+    .tab-content.active { display: block; animation: appear .24s ease both; }
+    @keyframes appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+    .section-heading h2, .section-heading h3 { margin: 0; font-size: 20px; line-height: 1.35; letter-spacing: -.035em; }
+    .section-heading p { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .section-icon { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: 17px; }
+    .note { margin-bottom: 20px; padding: 17px 18px; border: 1px solid #e3ebe3; border-radius: 15px; background: #f7faf7; }
+    .note p { margin: 0; color: #59645b; font-size: 13px; }
+    .note p + p { margin-top: 5px; }
+    .note strong { color: var(--ink); }
+    .schedule-list { display: grid; gap: 10px; }
+    .card { padding: 16px 18px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); transition: border-color .2s ease, transform .2s ease; }
+    .card:hover { border-color: #cbd9ce; transform: translateY(-1px); }
+    .card.highlighted { border-color: #d7e6d9; background: linear-gradient(110deg, #f1f7f1, #fbfdfb); }
+    .month { margin-bottom: 3px; color: var(--muted); font-size: 12px; font-weight: 600; }
+    .person { color: var(--ink); font-size: 16px; font-weight: 700; }
+    .receipt-list { padding: 4px 18px; }
+    .receipt { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); color: #485149; font-size: 14px; }
+    .receipt::before { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 9px; background: var(--surface-soft); color: var(--accent); content: "•"; font-size: 17px; }
+    .receipt:last-child { border-bottom: 0; }
+    .week { margin-bottom: 12px; color: var(--accent-dark); font-size: 12px; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+    .cleaning-group { padding: 19px; border: 1px solid var(--line); border-radius: 17px; background: #fafbfa; }
+    .cleaning-group.highlighted { border-color: #d7e6d9; background: #f7faf7; }
+    .cleaning-task { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+    .task-name { font-size: 14px; font-weight: 650; }
+    .task-assignment { text-align: right; }
+    .task-group { color: var(--accent-dark); font-size: 12px; font-weight: 750; }
+    .task-members { color: var(--muted); font-size: 12px; }
+    .week-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; margin: -4px 0 18px; }
+    .week-label { flex: 1; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .week-controls button { padding: 8px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: #5e695f; cursor: pointer; font-size: 12px; font-weight: 650; transition: background .2s ease, border-color .2s ease; }
+    .week-controls button:hover { border-color: #cbd9ce; background: var(--accent-soft); color: var(--accent-dark); }
+    .week-controls .reset-btn { border-color: transparent; background: transparent; }
+    .footer-note { margin: 17px 0 0; color: #9aa19b; font-size: 11px; text-align: center; }
+    @media (max-width: 600px) {
+      .page-shell { width: min(100% - 24px, 920px); padding: 25px 0 36px; }
+      .site-header { margin-bottom: 27px; }
+      .today-chip { padding: 8px 10px; font-size: 11px; }
+      .tab-nav { padding: 9px; }
+      .tab-btn { padding: 9px 12px; font-size: 12px; }
+      .cleaning-task { grid-template-columns: 1fr; gap: 5px; }
+      .task-assignment { text-align: left; }
+      .week-controls { justify-content: space-between; }
+      .week-label { flex-basis: 100%; }
     }
-    
-    .tab-btn {
-      flex: 1;
-      padding: 1rem 0.5rem;
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: white;
-      font-weight: bold;
-      font-size: 0.9rem;
-      opacity: 0.7;
-      transition: all 0.3s;
-    }
-    
-    .tab-btn.active {
-      opacity: 1;
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    .tab-content {
-      display: none;
-      padding: 1.5rem;
-    }
-    
-    .tab-content.active {
-      display: block;
-    }
-    
-    h2 {
-      margin-bottom: 1rem;
-      color: #2c3e50;
-      font-size: 1.3rem;
-    }
-    
-    .card {
-      background: #f9f9f9;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .highlighted {
-      background: #e3f2fd;
-      border-left: 4px solid #1976d2;
-    }
-    
-    .month {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      color: #1976d2;
-    }
-    
-    .person {
-      font-weight: bold;
-    }
-    
-    .receipt {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .receipt:last-child {
-      border-bottom: none;
-    }
-    
-    .week {
-      font-weight: bold;
-      color: #1976d2;
-      margin-top: 1rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .daily-schedule {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-    
-    .day {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.5rem;
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-    
-    .cleaning-group {
-      background: #f1f1f1;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
-    
-    .cleaning-task {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.5rem;
-      padding: 0.5rem;
-      background: white;
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-    
-    .task-name {
-      flex: 1;
-      font-weight: bold;
-    }
-    
-    .task-group {
-      color: #1976d2;
-      font-weight: bold;
-    }
-    
-    .task-members {
-      font-size: 0.9rem;
-      color: #666;
-    }
-    
-    .day-name {
-      font-weight: bold;
-      width: 100px;
-    }
-    
-    .current-date {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-/*.note {
-  background-color: #f9f9f9; /* Ubah warna latar belakang sesuai kebutuhan */
- /* border-radius: 8px; /* Kelengkungan pada sudut */
-/*  padding: 10px 15px; /* Spasi di dalam elemen */
-/*  margin: 10px 0; /* Jarak dengan elemen lain */
- /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Memberikan sedikit bayangan agar elemen lebih menonjol */
-}
-
-.note p {
-  margin: 0; /* Menghilangkan margin default pada paragraf */
-  font-weight: normal; /* Untuk menjaga konsistensi dengan h4 */
-}
-  
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   </style>
 </head>
 <body>
-      <h1>WEB ASRAMA BTS YEONGDONG</h1>
-  <div class="container">
-    <div class="tab-nav">
-      <button class="tab-btn active" data-tab="internet"> Bayar Internet</button>
-      <button class="tab-btn" data-tab="receipt"> Tukar Kuitansi</button>
-      <button class="tab-btn" data-tab="factory"> Sekom Pabrik 2</button>
-      <button class="tab-btn" data-tab="cleaning">Jadwal Piket</button>
-    </div>
-    
-    <div id="current-date" class="current-date"></div>
-    
-    <div id="internet" class="tab-content active">
-  <h2>Jadwal Bayar Internet</h2>
-  <div class="note">
-    <p>Tagihan: ₩35.000</p>
-    <p>Transfer ke: Woori 1002448818992 a.n. DIANTO SIGIT</p>
-  </div>
-  <div style="padding-top: 15px;" id="internet-schedule"></div>
-</div>
-    
-    <div id="receipt" class="tab-content">
-      <h2>Jadwal Tukar Kuitansi Belanja</h2>
-      <div id="receipt-schedule"></div>
-    </div>
-    
-    <div id="factory" class="tab-content">
-      <h2>Jadwal Sekom Pabrik 2</h2>
-      <div id="factory-schedule"></div>
-    </div>
-    
-<div id="cleaning" class="tab-content">
-  <h3>Jadwal Piket Bersih-bersih</h3>
+  <main class="page-shell">
+    <header class="site-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">BY</div>
+        <div>
+          <p class="brand-name">BTS Yeongdong</p>
+          <p class="brand-caption">Informasi asrama</p>
+        </div>
+      </div>
+      <div id="current-date" class="today-chip" aria-label="Tanggal hari ini"></div>
+    </header>
 
-  <div style="text-align: center; margin-bottom: 1rem;">
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow">Tetap teratur, tinggal nyaman</p>
+      <h1 id="page-title">Jadwal Asrama</h1>
+      <p>Informasi pembayaran, tugas, dan jadwal piket bersama.</p>
+    </section>
 
-    <span id="week-label" style="margin: 0 1rem; font-weight: bold;">Minggu Ini</span>
+    <section class="app-card" aria-label="Informasi dan jadwal asrama">
+      <nav class="tab-nav" aria-label="Kategori jadwal">
+        <button class="tab-btn active" type="button" data-tab="internet" aria-selected="true">Bayar Internet</button>
+        <button class="tab-btn" type="button" data-tab="receipt" aria-selected="false">Tukar Kuitansi</button>
+        <button class="tab-btn" type="button" data-tab="factory" aria-selected="false">Sekom Pabrik</button>
+        <button class="tab-btn" type="button" data-tab="cleaning" aria-selected="false">Jadwal Piket</button>
+      </nav>
 
+      <div id="internet" class="tab-content active" role="tabpanel">
+        <div class="section-heading">
+          <div><h2>Jadwal Bayar Internet</h2><p>Rotasi pembayaran bulanan.</p></div>
+          <span class="section-icon" aria-hidden="true">₩</span>
+        </div>
+        <div class="note">
+          <p><strong>Tagihan:</strong> ₩35.000</p>
+          <p><strong>Transfer ke:</strong> Woori 1002448818992 a.n. DIANTO SIGIT</p>
+        </div>
+        <div class="schedule-list" id="internet-schedule"></div>
+      </div>
 
-  </div> 
-    <button onclick="changeCleaningWeek(-1)">« Minggu Lalu</button>
+      <div id="receipt" class="tab-content" role="tabpanel">
+        <div class="section-heading">
+          <div><h2>Jadwal Tukar Kuitansi</h2><p>Urutan giliran kuitansi belanja.</p></div>
+          <span class="section-icon" aria-hidden="true">↻</span>
+        </div>
+        <div id="receipt-schedule"></div>
+      </div>
 
-  <button onclick="resetCleaningWeek()" style="margin-left: 1rem;">Reset</button>
-    <button onclick="changeCleaningWeek(1)">Minggu Depan »</button>
-  
-  <div style="padding-top: 15px;" id="cleaning-schedule"></div>
-</div>
-    
+      <div id="factory" class="tab-content" role="tabpanel">
+        <div class="section-heading">
+          <div><h2>Jadwal Sekom Pabrik 2</h2><p>Petugas minggu ini dan urutan rotasi.</p></div>
+          <span class="section-icon" aria-hidden="true">▦</span>
+        </div>
+        <div class="schedule-list" id="factory-schedule"></div>
+      </div>
+
+      <div id="cleaning" class="tab-content" role="tabpanel">
+        <div class="section-heading">
+          <div><h2>Jadwal Piket</h2><p>Pembagian tugas bersih-bersih asrama.</p></div>
+          <span class="section-icon" aria-hidden="true">✦</span>
+        </div>
+        <div class="week-controls">
+          <span id="week-label" class="week-label">Minggu Ini</span>
+          <button type="button" onclick="changeCleaningWeek(-1)">‹ Minggu lalu</button>
+          <button type="button" class="reset-btn" onclick="resetCleaningWeek()">Minggu ini</button>
+          <button type="button" onclick="changeCleaningWeek(1)">Minggu depan ›</button>
+        </div>
+        <div id="cleaning-schedule"></div>
+      </div>
+    </section>
+    <p class="footer-note">BTS Yeongdong · Jadwal asrama</p>
+  </main>
+
   <script>
-    // Data karyawan
-    const employees = [
-      'Hari', 'Ihsan', 'Dianto', 'Joko',
-      'Galang', 'Chandra', 'Alif'
-    ];
-    // piket
-const employee = [
-      'Dianto', 'Chandra', 'Hari', 'Rizky', 'Ihsan', 'Yoyon', 'Joko', 'Galang'
-    ];
-
-    //kuitansi
-    const employe = [
-      'Dianto', 'Ihsan', 'Hari',
-      'Galang', 'Chandra', 'Joko', 'Yoyon', 'Faiz', 'Rizky', 'Zidan'
-    ];
-    
-    // Data karyawan pabrik (5 orang)
-    const factoryEmployees = [
-      'Hari', 'Dianto', 'Kayan', 'Joko', 'Rizky', 'Zidan', 'Faiz'
-    ];
-    
-    // Nama bulan dalam bahasa Indonesia
-    const months = [
-      'Januari', 'Februari', 'Maret', 'April', 
-      'Mei', 'Juni', 'Juli', 'Agustus', 
-      'September', 'Oktober', 'November', 'Desember'
-    ];
-    
-    // Nama hari dalam bahasa Indonesia
-    const days = [
-      'Minggu', 'Senin', 'Selasa', 'Rabu', 
-      'Kamis', 'Jumat', 'Sabtu'
-    ];
-    
-    // Tanggal saat ini
+    const employees = ['Hari', 'Ihsan', 'Dianto', 'Joko', 'Galang', 'Chandra', 'Alif'];
+    const employee = ['Dianto', 'Chandra', 'Hari', 'Rizky', 'Ihsan', 'Yoyon', 'Joko', 'Galang'];
+    const employe = ['Dianto', 'Ihsan', 'Hari', 'Galang', 'Chandra', 'Joko', 'Yoyon', 'Faiz', 'Rizky', 'Zidan'];
+    const factoryEmployees = ['Hari', 'Dianto', 'Kayan', 'Joko', 'Rizky', 'Zidan', 'Faiz'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const currentDate = new Date();
     const currentMonth = currentDate.getMonth();
     const currentYear = currentDate.getFullYear();
     const currentDay = currentDate.getDay();
-    
-    // Set tanggal saat ini
-    document.getElementById('current-date').textContent = 
-      `${days[currentDay]}, ${currentDate.getDate()} ${months[currentMonth]} ${currentYear}`;
-    
-    // Fungsi untuk mendapatkan orang yang bayar internet bulan ini
+
+    document.getElementById('current-date').textContent = `${days[currentDay]}, ${currentDate.getDate()} ${months[currentMonth]} ${currentYear}`;
+
     function getInternetPayer(month, year) {
-      // Menghitung berapa bulan sejak Januari 2025 (misalnya)
-      const baseYear = 2025;
-      const baseMonth = 0; // Januari
-      
-      const monthDiff = (year - baseYear) * 12 + (month - baseMonth);
-      const personIndex = monthDiff % employees.length;
-      
-      return employees[personIndex >= 0 ? personIndex : personIndex + employees.length];
+      const monthDiff = (year - 2025) * 12 + month;
+      const personIndex = ((monthDiff % employees.length) + employees.length) % employees.length;
+      return employees[personIndex];
     }
-    
-    // Fungsi untuk mendapatkan jadwal bayar internet
+
     function generateInternetSchedule() {
       const scheduleDiv = document.getElementById('internet-schedule');
       scheduleDiv.innerHTML = '';
-      
-      // Menampilkan jadwal untuk 12 bulan ke depan
       for (let i = 0; i < 8; i++) {
         const monthIndex = (currentMonth + i) % 12;
         const year = currentYear + Math.floor((currentMonth + i) / 12);
-        const payer = getInternetPayer(monthIndex, year);
-        
         const card = document.createElement('div');
         card.classList.add('card');
-        
-        // Highlight bulan saat ini
-        if (i === 0) {
-          card.classList.add('highlighted');
-        }
-        
-        card.innerHTML = `
-          <div class="month">${months[monthIndex]} ${year}</div>
-          <div class="person">${payer}</div>
-        `;
-        
+        if (i === 0) card.classList.add('highlighted');
+        card.innerHTML = `<div class="month">${months[monthIndex]} ${year}${i === 0 ? ' · Bulan ini' : ''}</div><div class="person">${getInternetPayer(monthIndex, year)}</div>`;
         scheduleDiv.appendChild(card);
       }
     }
-    
-    // Fungsi untuk mendapatkan jadwal tukar kuitansi (sama seperti jadwal internet, hanya tampilan berbeda)
+
     function generateReceiptSchedule() {
       const scheduleDiv = document.getElementById('receipt-schedule');
       scheduleDiv.innerHTML = '';
-      
-      // Membuat daftar untuk 8 orang (1 putaran)
       const receiptList = document.createElement('div');
-      receiptList.classList.add('card');
-      
-      for (const employee of employe) {
+      receiptList.classList.add('card', 'receipt-list');
+      for (const name of employe) {
         const receiptItem = document.createElement('div');
         receiptItem.classList.add('receipt');
-        
-        // Highlight orang yang bertugas bulan ini
-    // if (employee === getInternetPayer(currentMonth, currentYear)) {
-         //  receiptItem.classList.add('highlighted');
-     //   }
-        
-       receiptItem.innerHTML = `
-          <span>${employee}</span>
-        `;
-        
+        receiptItem.textContent = name;
         receiptList.appendChild(receiptItem);
       }
-      
       scheduleDiv.appendChild(receiptList);
     }
-    
-    // Fungsi untuk mendapatkan jadwal sekom pabrik
-   function generateFactorySchedule() {
-  const scheduleDiv = document.getElementById('factory-schedule');
-  scheduleDiv.innerHTML = '';
 
-  // Menghitung minggu dari 6 Januari 2025 (mulai Senin)
-  const baseDate = new Date(2025, 0, 6); // 6 Jan 2025 = Senin pertama
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const daysDiff = Math.floor((currentDate - baseDate) / msPerDay);
-  const weekNumber = Math.floor(daysDiff / 7);
+    function generateFactorySchedule() {
+      const scheduleDiv = document.getElementById('factory-schedule');
+      scheduleDiv.innerHTML = '';
+      const baseDate = new Date(2025, 0, 6);
+      const daysDiff = Math.floor((currentDate - baseDate) / (24 * 60 * 60 * 1000));
+      const weekNumber = Math.floor(daysDiff / 7);
+      const currentPersonIndex = ((weekNumber % factoryEmployees.length) + factoryEmployees.length) % factoryEmployees.length;
+      const currentPerson = factoryEmployees[currentPersonIndex];
+      const card = document.createElement('div');
+      card.classList.add('card', 'highlighted');
+      card.innerHTML = `<div class="week">Yang bertugas minggu ini</div><div class="person">${currentPerson}</div>`;
+      scheduleDiv.appendChild(card);
+      const rotationCard = document.createElement('div');
+      rotationCard.classList.add('card');
+      rotationCard.innerHTML = `<div class="week">Urutan rotasi sekom</div>${factoryEmployees.map((_, i) => {
+        const index = ((weekNumber + i) % factoryEmployees.length + factoryEmployees.length) % factoryEmployees.length;
+        return `<div class="receipt">${i + 1}. ${factoryEmployees[index]}</div>`;
+      }).join('')}`;
+      scheduleDiv.appendChild(rotationCard);
+    }
 
-  const currentPersonIndex = weekNumber % factoryEmployees.length;
-  const currentPerson = factoryEmployees[currentPersonIndex];
-
-  // Tampilkan siapa yang bertugas minggu ini
-  const card = document.createElement('div');
-  card.classList.add('card', 'highlighted');
-  card.innerHTML = `
-    <div class="week">Yang bertugas minggu ini:</div>
-    <div class="person">${currentPerson}</div>
-  `;
-  scheduleDiv.appendChild(card);
-
-  // Tambahkan info urutan rotasi
-  const rotationCard = document.createElement('div');
-  rotationCard.classList.add('card');
-  rotationCard.innerHTML = `
-    <div class="week">Urutan Rotasi Sekom:</div>
-    ${factoryEmployees.map((name, i) => {
-      const index = (weekNumber + i) % factoryEmployees.length;
-      return `<div>${i + 1}. ${factoryEmployees[index]}</div>`;
-    }).join('')}
-  `;
-  scheduleDiv.appendChild(rotationCard);
-}
-    // Tab navigation
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
-    
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const tabId = btn.dataset.tab;
-        
-        // Remove active class from all buttons and tabs
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        
-        // Add active class to current button and tab
-        btn.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
+        tabBtns.forEach(button => {
+          const isActive = button === btn;
+          button.classList.toggle('active', isActive);
+          button.setAttribute('aria-selected', String(isActive));
+        });
+        tabContents.forEach(content => content.classList.toggle('active', content.id === tabId));
       });
     });
-    
-    // Data untuk jadwal piket
+
     const cleaningGroups = [
-      { 
-        name: 'Grup 1', 
-        members: [employee[0], employee[1]] 
-      },
-      { 
-        name: 'Grup 2', 
-        members: [employee[2], employee[3]] 
-      },
-      { 
-        name: 'Grup 3', 
-        members: [employee[4], employee[5]] 
-      },
-      { 
-        name: 'Grup 4', 
-        members: [employee[6], employee[7]] 
-      }
+      { name: 'Grup 1', members: [employee[0], employee[1]] },
+      { name: 'Grup 2', members: [employee[2], employee[3]] },
+      { name: 'Grup 3', members: [employee[4], employee[5]] },
+      { name: 'Grup 4', members: [employee[6], employee[7]] }
     ];
-    
-    const cleaningTasks = [
-      'Buang Sampah',
-      'Bersih-bersih Lorong dan Tangga',
-      'Bersih-bersih Toilet Bawah',
-      'Bersih-bersih Toilet Atas + Dapur'
-    ];
-    
-    // Fungsi untuk mendapatkan jadwal piket
+    const cleaningTasks = ['Buang Sampah', 'Bersih-bersih Lorong dan Tangga', 'Bersih-bersih Toilet Bawah', 'Bersih-bersih Toilet Atas + Dapur'];
     let weekOffset = 0;
 
-function generateCleaningSchedule() {
-  const scheduleDiv = document.getElementById('cleaning-schedule');
-  scheduleDiv.innerHTML = '';
+    function generateCleaningSchedule() {
+      const scheduleDiv = document.getElementById('cleaning-schedule');
+      scheduleDiv.innerHTML = '';
+      const baseDate = new Date(2025, 0, 6);
+      const daysDiff = Math.floor((currentDate - baseDate) / (24 * 60 * 60 * 1000));
+      const currentWeek = Math.floor(daysDiff / 7);
+      const targetWeek = currentWeek + weekOffset;
+      const weekIndex = ((targetWeek % 4) + 4) % 4;
+      const labelText = weekOffset === 0 ? 'Minggu Ini' : weekOffset > 0 ? `Minggu ke-${weekOffset} ke Depan` : `Minggu ke-${Math.abs(weekOffset)} Lalu`;
+      document.getElementById('week-label').textContent = labelText;
+      const weekContainer = document.createElement('div');
+      weekContainer.classList.add('cleaning-group');
+      if (weekOffset === 0) weekContainer.classList.add('highlighted');
+      weekContainer.innerHTML = `<div class="week">${labelText}</div>`;
+      for (let taskIndex = 0; taskIndex < cleaningTasks.length; taskIndex++) {
+        const groupIndex = ((taskIndex - weekIndex) % 4 + 4) % 4;
+        const group = cleaningGroups[groupIndex];
+        const taskDiv = document.createElement('div');
+        taskDiv.classList.add('cleaning-task');
+        taskDiv.innerHTML = `<div class="task-name">${cleaningTasks[taskIndex]}</div><div class="task-assignment"><div class="task-group">${group.name}</div><div class="task-members">${group.members.join(', ')}</div></div>`;
+        weekContainer.appendChild(taskDiv);
+      }
+      scheduleDiv.appendChild(weekContainer);
+    }
 
-  const baseDate = new Date(2025, 0, 6);
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const daysDiff = Math.floor((currentDate - baseDate) / msPerDay);
-  const currentWeek = Math.floor(daysDiff / 7);
-  const targetWeek = currentWeek + weekOffset;
-  const weekIndex = targetWeek % 4;
+    function changeCleaningWeek(change) {
+      weekOffset += change;
+      generateCleaningSchedule();
+    }
 
-  const labelText = weekOffset === 0 ? 'Minggu Ini' :
-                    weekOffset > 0 ? `Minggu ke-${weekOffset} ke Depan` :
-                    `Minggu ke-${Math.abs(weekOffset)} Lalu`;
+    function resetCleaningWeek() {
+      weekOffset = 0;
+      generateCleaningSchedule();
+    }
 
-  document.getElementById('week-label').textContent = labelText;
-
-  const weekContainer = document.createElement('div');
-  weekContainer.classList.add('cleaning-group');
-  if (weekOffset === 0) weekContainer.classList.add('highlighted');
-  weekContainer.innerHTML = `<div class="week">${labelText}</div>`;
-
-  for (let taskIndex = 0; taskIndex < cleaningTasks.length; taskIndex++) {
-    const groupIndex = ((taskIndex - weekIndex) % 4 + 4) % 4;
-    const group = cleaningGroups[groupIndex];
-
-    const taskDiv = document.createElement('div');
-    taskDiv.classList.add('cleaning-task');
-
-    taskDiv.innerHTML = `
-      <div class="task-name">${cleaningTasks[taskIndex]}</div>
-      <div>
-        <div class="task-group">${group.name}</div>
-        <div class="task-members">${group.members.join(', ')}</div>
-      </div>
-    `;
-
-    weekContainer.appendChild(taskDiv);
-  }
-
-  scheduleDiv.appendChild(weekContainer);
-}
-
-function changeCleaningWeek(change) {
-  weekOffset += change;
-  generateCleaningSchedule();
-}
-
-function resetCleaningWeek() {
-  weekOffset = 0;
-  generateCleaningSchedule();
-}
-    
-    // Initialize schedules
     generateInternetSchedule();
     generateReceiptSchedule();
     generateFactorySchedule();
