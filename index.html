@@ -198,7 +198,7 @@
     function generateInternetSchedule() {
       const scheduleDiv = document.getElementById('internet-schedule');
       scheduleDiv.innerHTML = '';
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 12; i++) {
         const monthIndex = (currentMonth + i) % 12;
         const year = currentYear + Math.floor((currentMonth + i) / 12);
         const card = document.createElement('div');
